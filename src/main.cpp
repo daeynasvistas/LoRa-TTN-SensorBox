@@ -11,6 +11,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
+#include <sound_meter.h>
 
 /* ************************************************************** 
  * Sensor setup
@@ -19,6 +20,17 @@
 #define SEALEVELPRESSURE_HPA (1032.00)
 Adafruit_BME280 bme; // I2C
 Adafruit_CCS811 ccs; // I2C
+
+// SOUND
+int soundPin = 37; 
+int sensorValue = 0; 
+float soundValue = 0.0; 
+
+// LUX
+int luxPin = 38; // select the input pin for the potentiometer
+float luxrawRange = 4096;
+float luxlogRange = 4.6;
+int LuxSensorValue = 0;
 
 // sensor variables
 float tempC = 0.0;
@@ -30,12 +42,12 @@ float eCO2 = 0.0;
 float TVOC  = 0.0;
 
 
-
 #define LEDPIN 2
 #define ANALOG_PIN       35
 #define ANALOG_MAX_VALUE 4095
 
 #define ACT_METHOD_ABP// define the activation method ABP or OTAA
+
 //#define DEBUG
 #define CFG_eu868
 
@@ -51,7 +63,7 @@ static const uint32_t DEVADDR = 0x26011E27;
  * user settings
  * *************************************************************/
 // Schedule TX every this many seconds (might become longer due to duty cycle limitations).
-const unsigned TX_INTERVAL = 600; 
+const unsigned TX_INTERVAL = 600;  // not used
 //unsigned int countero = 0;
 unsigned int serial_act = 1;
 unsigned long starttime;  //unsigned long cycle_length = TX_INTERVAL * 1000UL; // cycle in secs, currently unused;
@@ -68,7 +80,6 @@ unsigned int counter = 0;
 
 // data to send less is better!
 static uint8_t dataTX[16];
-
 
 
 // Uses LMIC libary by Thomas Telkamp and Matthijs Kooijman (https://github.com/matthijskooijman/arduino-lmic)
@@ -153,8 +164,41 @@ void scanI2C(){
 
 }
 
+/* **************************************************************
+ * SOUND LUX
+ * *************************************************************/
+float RawToLux(int raw){
+float logLux = raw * luxlogRange / luxrawRange;
+return pow(10, logLux);
+}
 
+void readSound(){
+  int level = analogRead(soundPin);
+  int *plevel = &level;
+  #ifdef DEBUG
+  // Print some messages
+  Serial.print("Analog: ");
+  Serial.print(level);
+  Serial.print(" (");
+  #endif
+  // Print absolute sound db from level value
+  soundValue = (get_abs_db(plevel));
 
+}
+
+int luxValue = 0; // variable to store the value coming from the sensor
+void luxSound(){
+  // read the raw value from the sensor:
+  int rawValue = analogRead(luxPin);
+   #ifdef DEBUG
+   Serial.print("Raw light = ");
+   Serial.print(rawValue);
+   Serial.print(" - Lux = ");
+   Serial.println(RawToLux(rawValue));
+   #endif
+
+  LuxSensorValue = RawToLux(rawValue);
+}
 
 /* **************************************************************
  * sensor code, typical would be init_sensor(), do_sense(), build_data()
@@ -179,17 +223,69 @@ void init_sensor() {
   while(!ccs.available());
   float temp = ccs.calculateTemperature();
   ccs.setTempOffset(temp - 25.0);
+
+  // SOUND
+  pinMode(soundPin,INPUT);
+  adcAttachPin(soundPin);
+
  
 }
 
 
+void show_display_A(){
 
+  if (serial_act == 1) { 
+  display.clear();
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+  display.setFont(ArialMT_Plain_10);
 
+  String tempS = "Temperatura : " + String(tempC-10.0) + "°C";
+  display.drawString(0, 1, tempS);
+  String humidityS = "Humidade : " + String(humidity) + "%";
+  display.drawString(0, 12, humidityS);
+  //u8x8.setCursor(0, 5);
+  // u8x8.printf("Press: %.1fhPa", pressure);
+  String presS = "Pressão : " + String(pressure) + "hPa";
+  display.drawString(0, 23, presS);
+  String alt = "Altitude : " + String(altitudeMeter) + "m";
+  display.drawString(0, 34, alt);
+  String counters = "Pacotes Enviados : " + String(countero);
+  display.drawString(0, 45, counters);
+  display.display();
+  }
+}
+void show_display_B(){
+
+  if (serial_act == 1) { 
+  display.clear();
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+  display.setFont(ArialMT_Plain_10);
+
+  String eCo2S = "eCo2 : " + String(eCO2) + "";
+  display.drawString(0, 1, eCo2S);
+  String TVOCS = "TVOC : " + String(TVOC) + "ppm";
+  display.drawString(0, 12, TVOCS);
+  //u8x8.setCursor(0, 5);
+  // u8x8.printf("Press: %.1fhPa", pressure);
+  String soundSS = "Sound : " + String(soundValue) + "dB";
+  display.drawString(0, 23, soundSS);
+  String luxS = "Luminosidade : " + String(LuxSensorValue) + "lux";
+  display.drawString(0, 34, luxS);
+  String counters = "Pacotes Enviados : " + String(countero);
+  display.drawString(0, 45, counters);
+  display.display();
+  }
+}
 
 /* **************************************************************
  * do the reading
  * *************************************************************/
 void do_sense() {
+
+        // SOUND LUX DEBUG
+   readSound();
+   luxSound();
+
   // BME -----------------------------------
   tempC = bme.readTemperature();
   humidity = bme.readHumidity();
@@ -204,25 +300,7 @@ void do_sense() {
     return;
   }
   
-  if (serial_act == 1) { 
-  display.clear();
-  display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.setFont(ArialMT_Plain_10);
-
-  String tempS = "Temperatura : " + String(tempC) + "°C";
-  display.drawString(0, 1, tempS);
-  String humidityS = "Humidade : " + String(humidity) + "%";
-  display.drawString(0, 12, humidityS);
-  //u8x8.setCursor(0, 5);
-  // u8x8.printf("Press: %.1fhPa", pressure);
-  String presS = "Pressão : " + String(pressure) + "hPa";
-  display.drawString(0, 23, presS);
-  String alt = "Altitude : " + String(altitudeMeter) + "m";
-  display.drawString(0, 34, alt);
-  String counters = "Pacotes Enviados : " + String(countero);
-  display.drawString(0, 45, counters);
-  display.display();
-  }
+  show_display_A();
 
 
   // Co2 ------ BURN SENSOR ----------------------
@@ -233,7 +311,7 @@ void do_sense() {
       delay(500);
       TVOC = ccs.getTVOC();
       delay(500);
-      if (isnan(eCO2) || isnan(tempC) || isnan(TVOC) ) {
+      if (isnan(eCO2) || isnan(TVOC) ) {
         #ifdef DEBUG   
           Serial.println("Failed to read from Co2 sensor!");
         #endif  
@@ -252,6 +330,9 @@ void do_sense() {
   //  #endif
     //----------------  
   delay(10000); // time for co2 burn
+  if (i ==6){
+     show_display_B();
+  }
 
 }
 
@@ -274,30 +355,40 @@ void do_sense() {
 /* **************************************************************
  * build data to transmit in dataTX
  *
- * Suggested payload function for this data
+ * Sugestão para Payload
  *
  * function Decoder(bytes, port) {
- * var temp = parseInt(bytes[0] + (bytes[1] << 8 ) - 500) / 10 ;
- * var humidity = parseInt(bytes[2] + (bytes[3] << 8 ) ;
- * var pressure = parseInt(bytes[4] + (bytes[5] << 8 )) / 10;
- * // don't know why, but in my case the altitude was about 90 meter to low, so added 90 meters
- * var altitude = parseInt(bytes[6] + (bytes[7] << 8 ) - 100) / 10; 
- * return { temp: temp,
- *        humidity: humidity,
- *        pressure: pressure, 
- *        altitude: altitude
- * };
-* }
+ *  var temp = parseInt(bytes[0] + (bytes[1] << 8 ) - 500) / 10;
+ *  var humidity = parseInt(bytes[2] + (bytes[3] << 8 ));
+ *  var pressure = parseInt(bytes[4] + (bytes[5] << 8 )) / 10;
+ *  var altitude = parseInt(bytes[6] + (bytes[7] << 8 ) - 100) / 10;
+ *  var eCo2 = parseInt(bytes[8] + (bytes[9] << 8 ) ) / 10; 
+ *  var TVOC = parseInt(bytes[10] + (bytes[11] << 8 )) / 10; 
+ *  var LUX = parseInt(bytes[12] + (bytes[13] << 8 )) ; 
+ *  var SOUND = parseInt(bytes[14] + (bytes[15] << 8 )) / 100;  
+ *   
+ *  return { temp: temp,
+ **         humidity: humidity,
+ *         pressure: pressure, 
+ *         altitude: altitude,
+ *         eCo2:eCo2,
+ *         TVOC:TVOC,
+ *         LUX:LUX,
+ *         SOUND:SOUND
+ *  }
+ * }
+ * 
  * *************************************************************/
 void build_data() {
 
-  int dtempC = (tempC + 50) * 10;
+  int dtempC = (tempC+40) * 10;
   int dpressure = pressure * 10;
   int daltitude = (altitudeMeter)  * 10;
 
   int dco2 = (eCO2)  * 10;
   int dTVOC = (TVOC)  * 10;
 
+  int dSoundValue = soundValue *10;
 
   dataTX[0] = dtempC;
   dataTX[1] = dtempC >> 8;
@@ -313,8 +404,13 @@ void build_data() {
   dataTX[10] = (dTVOC);
   dataTX[11] = (dTVOC) >> 8;  
 
+  dataTX[12] = LuxSensorValue;
+  dataTX[13] = (LuxSensorValue) >> 8;
 
+  dataTX[14] = dSoundValue;
+  dataTX[15] = (dSoundValue) >> 8;
 
+Serial.println(dtempC);
 }
 
 /* **************************************************************
@@ -571,7 +667,6 @@ void setup() {
   display.drawString(0, 00, "IPG SFarm LoRa V0.6");
   display.display();
 
-
   delay(1000);
    // starttime = millis();
     if(bootCount == 0) //Run this only the first time
@@ -583,9 +678,9 @@ void setup() {
       build_data();
       LMIC.seqnoUp += bootCount; // deep sleep guardar ounter pacotes
  
-     int analogValue = analogRead(ANALOG_PIN);
-     float voltage = analogValue * (3.3 / ANALOG_MAX_VALUE);
-     Serial.println(analogValue);
+    // int analogValue = analogRead(37);////ANALOG_PIN);
+    // float voltage = analogValue * (3.3 / ANALOG_MAX_VALUE);
+    // Serial.println(analogValue);
 
      
      do_send();
@@ -605,8 +700,7 @@ void loop() {
 do_sense();
 build_data();
 do_send();
-*/
-
+ */
 
 //  if ((millis() - starttime) > cycle_length) { build_data(); do_send(); starttime = millis(); } // don't know how to rewrite this with ESP deepsleep
 //      Serial.println("Bring ESP to sleep mode 5minutes");
