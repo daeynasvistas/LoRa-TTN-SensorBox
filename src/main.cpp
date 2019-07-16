@@ -696,17 +696,5 @@ void setup() {
 
 void loop() {
 
-/*
-do_sense();
-build_data();
-do_send();
- */
-
-//  if ((millis() - starttime) > cycle_length) { build_data(); do_send(); starttime = millis(); } // don't know how to rewrite this with ESP deepsleep
-//      Serial.println("Bring ESP to sleep mode 5minutes");
-/* 5e6 is 5x10^6 microseconds */
-//    ESP.deepSleep(120e6); 
-
-
 
 }
