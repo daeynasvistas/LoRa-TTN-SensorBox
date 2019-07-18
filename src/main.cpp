@@ -15,8 +15,8 @@
 // MONITOR BAT LEVEL calibração
 #include <Pangodream_18650_CL.h> // Medidor BAT
 #define ADC_PIN 34
-#define CONV_FACTOR 1.8
-#define READS 20
+#define CONV_FACTOR 1.71
+#define READS 5
 Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
 
 /* ************************************************************** 
@@ -60,8 +60,8 @@ float TVOC  = 0.0;
 /* **************************************************************
 * keys for device
 * *************************************************************/
-static const uint8_t PROGMEM NWKSKEY[16] = { 0xE5, 0xD9, 0xC1, 0x31, 0x7F, 0xEC, 0x82, 0x00, 0xC5, 0x8E, 0xB1, 0xE6, 0xC8, 0x0E, 0x93, 0x34 };
-static const uint8_t PROGMEM APPSKEY[16] = { 0xFE, 0x5A, 0x6E, 0xB6, 0x3B, 0x0D, 0x2E, 0xAD, 0x17, 0xC0, 0x78, 0xFD, 0xF7, 0xD6, 0x80, 0xF9 };
+static const uint8_t PROGMEM NWKSKEY[16] = { 0xE5, 0xD9,.. };
+static const uint8_t PROGMEM APPSKEY[16] = { 0xFE, 0x5A, ... };
 static const uint32_t DEVADDR = 0x26011E27;
 
 
@@ -75,6 +75,7 @@ unsigned int serial_act = 1;
 unsigned long starttime;  //unsigned long cycle_length = TX_INTERVAL * 1000UL; // cycle in secs, currently unused;
 
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
+
 #define TIME_TO_SLEEP  120        /* Time ESP32 will go to sleep (in seconds) */
 RTC_DATA_ATTR int bootCount = 0;
 RTC_DATA_ATTR int countero = 0;
