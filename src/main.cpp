@@ -10,8 +10,14 @@
 #include "Adafruit_CCS811.h"
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
-
 #include <sound_meter.h>
+
+// MONITOR BAT LEVEL calibração
+#include <Pangodream_18650_CL.h> // Medidor BAT
+#define ADC_PIN 34
+#define CONV_FACTOR 1.8
+#define READS 20
+Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
 
 /* ************************************************************** 
  * Sensor setup
@@ -43,7 +49,7 @@ float TVOC  = 0.0;
 
 
 #define LEDPIN 2
-#define ANALOG_PIN       35
+//#define ANALOG_PIN       35
 #define ANALOG_MAX_VALUE 4095
 
 #define ACT_METHOD_ABP// define the activation method ABP or OTAA
@@ -52,7 +58,7 @@ float TVOC  = 0.0;
 #define CFG_eu868
 
 /* **************************************************************
-* keys for device (removed for forum posting)
+* keys for device
 * *************************************************************/
 static const uint8_t PROGMEM NWKSKEY[16] = { 0xE5, 0xD9, 0xC1, 0x31, 0x7F, 0xEC, 0x82, 0x00, 0xC5, 0x8E, 0xB1, 0xE6, 0xC8, 0x0E, 0x93, 0x34 };
 static const uint8_t PROGMEM APPSKEY[16] = { 0xFE, 0x5A, 0x6E, 0xB6, 0x3B, 0x0D, 0x2E, 0xAD, 0x17, 0xC0, 0x78, 0xFD, 0xF7, 0xD6, 0x80, 0xF9 };
@@ -78,7 +84,7 @@ RTC_DATA_ATTR int countero = 0;
 unsigned int counter = 0; 
 
 
-// data to send less is better!
+// payload ... menos é mais!
 static uint8_t dataTX[16];
 
 
@@ -182,8 +188,9 @@ void readSound(){
   Serial.print(" (");
   #endif
   // Print absolute sound db from level value
-  soundValue = (get_abs_db(plevel));
 
+  soundValue = (get_abs_db(plevel));
+  delay(50);
 }
 
 int luxValue = 0; // variable to store the value coming from the sensor
@@ -198,6 +205,7 @@ void luxSound(){
    #endif
 
   LuxSensorValue = RawToLux(rawValue);
+    delay(50);
 }
 
 /* **************************************************************
@@ -210,12 +218,12 @@ void init_sensor() {
 
 //scanI2C();
   if(!ccs.begin(0x5A)){
-    Serial.println("Failed to start Co2 sensor! Please check your wiring.");
+    Serial.println("Falhou sensor Co2! Please check your wiring.");
     while(1);
   }
 
   if (!bme.begin(0x76)){
-    Serial.println("Failed to start BME2180 sensor! Please check your wiring.");
+    Serial.println("Falhou sensor BME2180! Please check your wiring.");
     while(1);
   }
 
@@ -239,7 +247,7 @@ void show_display_A(){
   display.setTextAlignment(TEXT_ALIGN_LEFT);
   display.setFont(ArialMT_Plain_10);
 
-  String tempS = "Temperatura : " + String(tempC-10.0) + "°C";
+  String tempS = "Temperatura : " + String(tempC-5) + "°C";
   display.drawString(0, 1, tempS);
   String humidityS = "Humidade : " + String(humidity) + "%";
   display.drawString(0, 12, humidityS);
@@ -257,23 +265,41 @@ void show_display_A(){
 void show_display_B(){
 
   if (serial_act == 1) { 
-  display.clear();
-  display.setTextAlignment(TEXT_ALIGN_LEFT);
-  display.setFont(ArialMT_Plain_10);
+    display.clear();
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.setFont(ArialMT_Plain_10);
 
-  String eCo2S = "eCo2 : " + String(eCO2) + "";
-  display.drawString(0, 1, eCo2S);
-  String TVOCS = "TVOC : " + String(TVOC) + "ppm";
-  display.drawString(0, 12, TVOCS);
-  //u8x8.setCursor(0, 5);
-  // u8x8.printf("Press: %.1fhPa", pressure);
-  String soundSS = "Sound : " + String(soundValue) + "dB";
-  display.drawString(0, 23, soundSS);
-  String luxS = "Luminosidade : " + String(LuxSensorValue) + "lux";
-  display.drawString(0, 34, luxS);
-  String counters = "Pacotes Enviados : " + String(countero);
-  display.drawString(0, 45, counters);
-  display.display();
+    String eCo2S = "eCo2 : " + String(eCO2) + "";
+    display.drawString(0, 1, eCo2S);
+    String TVOCS = "TVOC : " + String(TVOC) + "ppm";
+    display.drawString(0, 12, TVOCS);
+    String soundSS = "Sound : " + String(soundValue) + "dB";
+    display.drawString(0, 23, soundSS);
+    String luxS = "Luminosidade : " + String(LuxSensorValue) + "lux";
+    display.drawString(0, 34, luxS);
+    String counters = "Pacotes Enviados : " + String(countero);
+    display.drawString(0, 45, counters);
+    display.display();
+  }
+}
+
+void show_display_C(){
+ if (serial_act == 1) { 
+    display.clear();
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.setFont(ArialMT_Plain_10);
+
+    String readS = "Valor lido : " + String(analogRead(34)) ;
+    display.drawString(0, 1, readS);
+    String avrS = "Média valores : " + String(BL.pinRead()) ;
+    display.drawString(0, 12, avrS);
+    String voltsS = "Volts : " + String(BL.getBatteryVolts());
+    display.drawString(0, 23, voltsS);
+    String chargLS = "Nível de Carga : " + String(BL.getBatteryChargeLevel());
+    display.drawString(0, 34, chargLS);
+    String counters = "Pacotes Enviados : " + String(countero);
+    display.drawString(0, 45, counters);
+    display.display();
   }
 }
 
@@ -330,9 +356,18 @@ void do_sense() {
   //  #endif
     //----------------  
   delay(10000); // time for co2 burn
-  if (i ==6){
+
+
+  if (i ==4)
+  {
+     show_display_C();
+  }  
+  
+  if (i==8)
+  {
      show_display_B();
   }
+
 
 }
 
@@ -381,19 +416,23 @@ void do_sense() {
  * *************************************************************/
 void build_data() {
 
-  int dtempC = (tempC+40) * 10;
+  int dtempC = (tempC-5) * 100;
   int dpressure = pressure * 10;
   int daltitude = (altitudeMeter)  * 10;
 
+  int dhumidity = humidity * 100;
+  
   int dco2 = (eCO2)  * 10;
   int dTVOC = (TVOC)  * 10;
 
-  int dSoundValue = soundValue *10;
+  int dSoundValue = soundValue;
+
+  int dBattery = BL.getBatteryChargeLevel();
 
   dataTX[0] = dtempC;
   dataTX[1] = dtempC >> 8;
-  dataTX[2] = int(humidity);
-  dataTX[3] = int(humidity) >> 8;
+  dataTX[2] = (dhumidity);
+  dataTX[3] = (dhumidity) >> 8;
   dataTX[4] = dpressure;
   dataTX[5] = dpressure >> 8;
   dataTX[6] = daltitude;
@@ -408,9 +447,10 @@ void build_data() {
   dataTX[13] = (LuxSensorValue) >> 8;
 
   dataTX[14] = dSoundValue;
-  dataTX[15] = (dSoundValue) >> 8;
+ 
+  dataTX[15] = (dBattery) ;
+ 
 
-Serial.println(dtempC);
 }
 
 /* **************************************************************
@@ -667,6 +707,7 @@ void setup() {
   display.drawString(0, 00, "IPG SFarm LoRa V0.6");
   display.display();
 
+
   delay(1000);
    // starttime = millis();
     if(bootCount == 0) //Run this only the first time
@@ -696,6 +737,11 @@ void setup() {
 
 void loop() {
 
-    delay(10);
+/*
+do_sense();
+build_data();
+do_send();
+ */
+//delay(10);
 
 }
