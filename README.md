@@ -77,13 +77,21 @@ ESP32 LoRA TTGO
 Placa Solar 5V 1W
 #### Sensores:
  BME280 Digital Sensor Temperature Humidity Atmospheric Pressure
+ 
  CJMCU-811V1 NTC CO2 eCO2 TVOC Air Mass
+ 
  GL5528 Light Sensor Module Light
+ 
  Photosensitive Sensor
+ 
  GY-BMP280 High Precision Atmospheric Pressure sensor
+ 
  FC-28 Soil Hygrometer Humidity Detection
-  OKY3131 High sensitive voice sensor module
+ 
+ OKY3131 High sensitive voice sensor module
+ 
  KY-026 Flame sensor module
+ 
  6DOF MPU-6050 Axis Gyro With Accelerometer  
   
 # Como instalar
