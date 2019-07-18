@@ -6,7 +6,9 @@
 
 Os dados ficam muito mais bonitos quando os pode visualizar. Este projeto torna fácil enviar dados de sensores de nodes LoRaWAN conectados à rede Things. 
 
-Neste repositório encontra um step by step para registar um Node (ESP32 LoRa) na plataform TTN e a forma de enviar para esta os valores dos sensores: Luminosidade, Humidade, Temperatura, eCo2, TVOc (Qualidade do ar), Som dB, Pressão Atmosférica e valor de carga da bateria utilizando LoRa. Isto numa caixa enegeticamente autonoma que pode ficar a vários kilometros de ditância entre o node e o gateway. Pode assim realizar leitura de sensores em locais remotos sem necessidade de acesso à internet nesses locais.
+Neste repositório encontra um step by step para registar um Node (ESP32 LoRa) na plataform TTN e a forma de enviar para esta os valores dos sensores: Luminosidade, Humidade, Temperatura, eCo2, TVOc (Qualidade do ar), Som dB, Pressão Atmosférica e valor de carga da bateria utilizando LoRa. Isto numa caixa enegeticamente autonoma que pode ficar a vários kilometros de ditância entre o node e o gateway. 
+
+Pode assim realizar leitura de sensores em locais remotos sem necessidade de acesso à internet nesses locais.
 
 Para visualizar os dados num mapa e na forma de um gráfico, pode utilizar este repositório:
 https://github.com/daeynasvistas/LoRa-TTN-map
