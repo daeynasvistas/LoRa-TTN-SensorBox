@@ -163,7 +163,7 @@ function Decoder(bytes, port) {
 
 
 ## Resultado
-<img src="https://user-images.githubusercontent.com/2634610/61478098-bfcc6280-a988-11e9-84fb-2ab843553e6c.png" width="400"><img src="https://user-images.githubusercontent.com/2634610/61477861-2604b580-a988-11e9-952f-e13b586248d8.png" width="350">
+<img src="https://user-images.githubusercontent.com/2634610/61478098-bfcc6280-a988-11e9-84fb-2ab843553e6c.png" width="400"><img src="https://user-images.githubusercontent.com/2634610/61477861-2604b580-a988-11e9-952f-e13b586248d8.png" width="40">
 
 ![IMG_20190715_090358](https://user-images.githubusercontent.com/2634610/61478252-10dc5680-a989-11e9-8bc8-b252453047d1.jpg)
 ![Capturar](https://user-images.githubusercontent.com/2634610/61478576-ad9ef400-a989-11e9-8cfc-eb5198ba3966.PNG)
