@@ -86,7 +86,12 @@ indicar de forma implícita a freq. que configurou no dragino, neste caso "86830
 | KY-026                | Flame sensor module                               |
 | 6DOF MPU-6050         | Axis Gyro With Accelerometer                      |
 
+### Dragino Gateway
 
+![1_lEjTfNTFnHXEfNBk9L4ENA](https://user-images.githubusercontent.com/2634610/61480043-fad09500-a98c-11e9-92f8-39651ff9bb0f.jpeg)
+
+ver aqui:
+https://pplware.sapo.pt/tutoriais/dragino-lora-gateway-ligar-rede-wi-fi/
   
 # Como instalar
 
