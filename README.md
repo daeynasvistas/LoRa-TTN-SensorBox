@@ -79,6 +79,7 @@ indicar de forma implícita a freq. que configurou no dragino, neste caso "86830
 | ----------------------|:-------------------------------------------------:|
 | ESP32 LoRA TTGO       | Lora, Wifi, BLE                                   |
 | Placa Solar           | 5V 1W                                             |
+| Bateria               | 3000mA 3.6V                                             |
 | BME280 Digital Sensor | Temperature Humidity Atmospheric Pressure         |
 | CJMCU-811V1           | NTC CO2 eCO2 TVOC Air Mass                        |
 | GL5528                | Light Sensor Module Light Photosensitive Sensor   |
