@@ -189,8 +189,7 @@ function Decoder(bytes, port) {
 ![replace](https://user-images.githubusercontent.com/2634610/61482059-a8de3e00-a991-11e9-8886-f3fd13ef37cb.png)
 ![4343](https://user-images.githubusercontent.com/2634610/61531509-e9d06400-aa1e-11e9-9a5d-d4d8d4d5a106.png)
 
-<img src="https://user-images.githubusercontent.com/2634610/61478252-10dc5680-a989-11e9-8bc8-b252453047d1.jpg" width="400"><img src="![156355922324479650](https://user-images.githubusercontent.com/2634610/61555681-d7bee780-aa57-11e9-9582-ce8b7de7fe88.png)
-" height="300">
+<img src="https://user-images.githubusercontent.com/2634610/61478252-10dc5680-a989-11e9-8bc8-b252453047d1.jpg" width="400"><img src="https://user-images.githubusercontent.com/2634610/61555681-d7bee780-aa57-11e9-9582-ce8b7de7fe88.png" height="300">
 
 ## Resultado num mapa
 
