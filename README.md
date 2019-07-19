@@ -191,6 +191,7 @@ function Decoder(bytes, port) {
 
 
 ![IMG_20190715_090358](https://user-images.githubusercontent.com/2634610/61478252-10dc5680-a989-11e9-8bc8-b252453047d1.jpg)
+![werwerew](https://user-images.githubusercontent.com/2634610/61555106-79453980-aa56-11e9-90e2-669755a5b487.png)
 
 ## Resultado num mapa
 
